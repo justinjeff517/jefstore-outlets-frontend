@@ -1,103 +1,175 @@
-import Image from "next/image";
+"use client"
 
-export default function Home() {
+import { useMemo, useState } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
+
+type Line = { id: string; name: string; qty: number; price: number }
+
+export default function Page() {
+  const [customer, setCustomer] = useState("")
+  const [name, setName] = useState("")
+  const [qty, setQty] = useState<number | "">("")
+  const [price, setPrice] = useState<number | "">("")
+  const [lines, setLines] = useState<Line[]>([])
+
+  const total = useMemo(
+    () => lines.reduce((s, l) => s + l.qty * l.price, 0),
+    [lines]
+  )
+
+  function addLine() {
+    if (!name || !qty || !price) return
+    setLines((prev) => [
+      ...prev,
+      { id: crypto.randomUUID(), name, qty: Number(qty), price: Number(price) },
+    ])
+    setName("")
+    setQty("")
+    setPrice("")
+  }
+
+  function removeLine(id: string) {
+    setLines((prev) => prev.filter((l) => l.id !== id))
+  }
+
+  function submitSale() {
+    const payload = {
+      customer: customer || "Walk-in",
+      date: new Date().toISOString(),
+      items: lines,
+      total,
+    }
+    console.log("SUBMIT_SALE", payload)
+    setCustomer("")
+    setLines([])
+  }
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <main className="flex-1 grid grid-rows-[auto,1fr,auto]">
+      <header className="sticky top-0 z-10 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+        <div className="px-4 py-3 max-w-sm mx-auto flex items-center justify-between">
+          <div className="text-base font-semibold">Sales Recorder</div>
+          <div className="text-xs text-muted-foreground">
+            {new Date().toLocaleDateString()}
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+      </header>
+
+      <section className="p-4 space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">New Sale</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="customer">Customer</Label>
+              <Input
+                id="customer"
+                placeholder="Walk-in"
+                value={customer}
+                onChange={(e) => setCustomer(e.target.value)}
+                inputMode="text"
+              />
+            </div>
+
+            <Separator />
+
+            <div className="grid grid-cols-5 gap-2 items-end">
+              <div className="col-span-3 space-y-1.5">
+                <Label htmlFor="name">Item</Label>
+                <Input
+                  id="name"
+                  placeholder="Product name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="qty">Qty</Label>
+                <Input
+                  id="qty"
+                  placeholder="0"
+                  value={qty}
+                  onChange={(e) => setQty(e.target.value === "" ? "" : Number(e.target.value))}
+                  inputMode="numeric"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="price">Price</Label>
+                <Input
+                  id="price"
+                  placeholder="0.00"
+                  value={price}
+                  onChange={(e) =>
+                    setPrice(e.target.value === "" ? "" : Number(e.target.value))
+                  }
+                  inputMode="decimal"
+                />
+              </div>
+              <div className="col-span-5">
+                <Button className="w-full" onClick={addLine} disabled={!name || !qty || !price}>
+                  Add Item
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {lines.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Items</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <ul className="space-y-2">
+                {lines.map((l) => (
+                  <li key={l.id} className="flex items-center justify-between rounded-lg border p-2">
+                    <div className="min-w-0">
+                      <div className="font-medium truncate">{l.name}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {l.qty} × {l.price.toLocaleString(undefined, { style: "currency", currency: "PHP" })}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="text-sm font-semibold">
+                        {(l.qty * l.price).toLocaleString(undefined, { style: "currency", currency: "PHP" })}
+                      </div>
+                      <Button variant="outline" size="sm" onClick={() => removeLine(l.id)}>
+                        Remove
+                      </Button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+
+              <Separator className="my-2" />
+
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-muted-foreground">Total</div>
+                <div className="text-lg font-bold">
+                  {total.toLocaleString(undefined, { style: "currency", currency: "PHP" })}
+                </div>
+              </div>
+
+              <Button className="w-full mt-2" onClick={submitSale} disabled={lines.length === 0}>
+                Save Sale
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+      </section>
+
+      <nav className="sticky bottom-0 border-t bg-background">
+        <div className="px-4 py-2 grid grid-cols-3 gap-2 max-w-sm mx-auto">
+          <Button variant="default">Home</Button>
+          <Button variant="outline">Sales</Button>
+          <Button variant="outline">Reports</Button>
+        </div>
+      </nav>
+    </main>
+  )
 }

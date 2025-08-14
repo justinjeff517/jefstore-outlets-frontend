@@ -1,0 +1,26 @@
+[
+  {
+    "Product": "EXAMPLEA_PCS_499_99",
+    "BeginningStock": 100,
+    "Sold": 30,
+    "EndingStock": 70
+  },
+  {
+    "Product": "EXAMPLEB_KG_120_50",
+    "BeginningStock": 50,
+    "Sold": 20,
+    "EndingStock": 30
+  },
+  {
+    "Product": "SUPERWIDGET_BOX_29_99",
+    "BeginningStock": 200,
+    "Sold": 75,
+    "EndingStock": 125
+  },
+  {
+    "Product": "MEGATOOL_SET_199_00",
+    "BeginningStock": 80,
+    "Sold": 10,
+    "EndingStock": 70
+  }
+]
