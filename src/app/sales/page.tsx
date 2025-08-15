@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { CalendarDays, DollarSign, Plus, X, CheckCircle2 } from 'lucide-react'
+import { CalendarDays, DollarSign, X, CheckCircle2, Pencil } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { useRouter } from 'next/navigation'
@@ -15,9 +15,9 @@ export default function Page() {
   const isoDate = today.toISOString().slice(0, 10)
   const totalSales = 0
 
-  const [expenseAmount, setExpenseAmount] = useState('')
-  const [expenseDescription, setExpenseDescription] = useState('')
-  const [expenseSaved, setExpenseSaved] = useState(false)
+  const [expenseAmount, setExpenseAmount] = useState('0')
+  const [expenseDescription, setExpenseDescription] = useState('none')
+  const [editMode, setEditMode] = useState(false)
   const router = useRouter()
 
   return (
@@ -51,15 +51,15 @@ export default function Page() {
       </Card>
 
       {/* Expenses Card */}
-      <Card className={expenseSaved ? 'border-green-500' : 'border-red-500'}>
+      <Card className={editMode ? 'border-red-500' : 'border-green-500'}>
         <CardHeader className="pb-2">
           <CardTitle className="text-base">Expenses</CardTitle>
           <CardDescription className="text-xs">
-            {expenseSaved ? 'Expense Recorded' : 'Enter today’s expense'}
+            {editMode ? 'Edit Expense' : 'Expense Recorded'}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
-          {!expenseSaved ? (
+          {editMode ? (
             <>
               <Textarea
                 placeholder="Description"
@@ -75,13 +75,9 @@ export default function Page() {
               <Button
                 className="w-full"
                 size="sm"
-                onClick={() => {
-                  if (expenseDescription && expenseAmount) {
-                    setExpenseSaved(true)
-                  }
-                }}
+                onClick={() => setEditMode(false)}
               >
-                <Plus className="mr-2 h-4 w-4" /> Add Expense
+                Save
               </Button>
             </>
           ) : (
@@ -97,9 +93,9 @@ export default function Page() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setExpenseSaved(false)}
+                onClick={() => setEditMode(true)}
               >
-                <X className="mr-2 h-4 w-4" /> Edit
+                <Pencil className="mr-2 h-4 w-4" /> Change
               </Button>
             </div>
           )}

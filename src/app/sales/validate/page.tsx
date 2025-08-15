@@ -227,6 +227,10 @@ export default function Page() {
             <span className="opacity-70">Net Sales</span>
             <span className="font-bold">₱{totals.netSales.toLocaleString('en-PH', { minimumFractionDigits: 2 })}</span>
           </div>
+          <div className="flex items-center justify-between text-sm">
+            <span className="opacity-70">Date</span>
+            <span className="font-bold">{humanDate}</span>
+          </div>
           <div className="flex gap-2">
             <Button variant="outline" className="w-1/3" onClick={() => router.back()}>
               <ArrowLeft className="w-4 h-4 mr-2" /> Edit

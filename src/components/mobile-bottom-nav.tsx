@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, Boxes, ShoppingBag, FileText, Settings } from "lucide-react"
+import { Boxes, ShoppingBag, FileText, Settings } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const items = [
@@ -22,17 +22,25 @@ export default function MobileBottomNav() {
           {items.map(({ href, label, Icon }) => {
             const active = pathname === href || (href !== "/" && pathname?.startsWith(href))
             return (
-              <li key={href}>
+              <li key={href} className="py-1">
                 <Link
                   href={href}
+                  aria-current={active ? "page" : undefined}
                   className={cn(
-                    "flex h-14 flex-col items-center justify-center gap-1 text-xs",
+                    "relative flex h-12 flex-col items-center justify-center gap-0.5 text-xs",
                     "hover:text-foreground/80",
-                    active ? "text-foreground" : "text-muted-foreground"
+                    active ? "text-primary" : "text-muted-foreground"
                   )}
                 >
-                  <Icon className={cn("h-5 w-5", active && "scale-110")} />
-                  <span>{label}</span>
+                  {/* Top indicator */}
+                  <span
+                    className={cn(
+                      "absolute -top-1 h-1 w-8 rounded-full transition-opacity",
+                      active ? "bg-primary opacity-100" : "opacity-0"
+                    )}
+                  />
+                  <Icon className={cn("h-5 w-5 transition-transform", active && "scale-110")} />
+                  <span className={cn(active && "font-semibold")}>{label}</span>
                 </Link>
               </li>
             )
