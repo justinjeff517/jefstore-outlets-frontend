@@ -1,0 +1,15 @@
+{
+  "inventory": {
+    "items": [
+      {
+        "product": "string",
+        "unit": "string",
+        "beginning": "number",
+        "addstock": "number",
+        "sold": "number",
+        "price": "number",
+        "ending": "number"
+      }
+    ]
+  }
+}

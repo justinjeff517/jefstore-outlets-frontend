@@ -2,11 +2,12 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Boxes, ShoppingBag, FileText, Settings } from "lucide-react"
+import { Egg, Sandwich, ShoppingBag, FileText, Settings } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const items = [
-  { href: "/inventory", label: "Inventory", Icon: Boxes },
+  { href: "/eggs", label: "Eggs", Icon: Egg },
+  { href: "/bread", label: "Bread", Icon: Sandwich },
   { href: "/sales", label: "Sales", Icon: ShoppingBag },
   { href: "/reports", label: "Reports", Icon: FileText },
   { href: "/settings", label: "Settings", Icon: Settings },
@@ -18,7 +19,7 @@ export default function MobileBottomNav() {
   return (
     <nav className="fixed inset-x-0 bottom-0 z-50 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto max-w-sm">
-        <ul className="grid grid-cols-4">
+        <ul className="grid grid-cols-5">
           {items.map(({ href, label, Icon }) => {
             const active = pathname === href || (href !== "/" && pathname?.startsWith(href))
             return (
@@ -31,7 +32,6 @@ export default function MobileBottomNav() {
                     active ? "text-primary" : "text-muted-foreground hover:text-foreground/80"
                   )}
                 >
-                  {/* Top indicator */}
                   <span
                     className={cn(
                       "absolute -top-1 h-1 w-8 rounded-full transition-all duration-300",
