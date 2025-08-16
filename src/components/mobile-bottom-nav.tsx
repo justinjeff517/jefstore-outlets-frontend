@@ -27,20 +27,19 @@ export default function MobileBottomNav() {
                   href={href}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "relative flex h-12 flex-col items-center justify-center gap-0.5 text-xs",
-                    "hover:text-foreground/80",
-                    active ? "text-primary" : "text-muted-foreground"
+                    "relative flex h-12 flex-col items-center justify-center gap-0.5 text-xs transition-colors",
+                    active ? "text-primary" : "text-muted-foreground hover:text-foreground/80"
                   )}
                 >
                   {/* Top indicator */}
                   <span
                     className={cn(
-                      "absolute -top-1 h-1 w-8 rounded-full transition-opacity",
+                      "absolute -top-1 h-1 w-8 rounded-full transition-all duration-300",
                       active ? "bg-primary opacity-100" : "opacity-0"
                     )}
                   />
-                  <Icon className={cn("h-5 w-5 transition-transform", active && "scale-110")} />
-                  <span className={cn(active && "font-semibold")}>{label}</span>
+                  <Icon className={cn("h-5 w-5 transition-transform duration-200", active && "scale-125")} />
+                  <span className={cn("transition-all", active && "font-semibold text-sm")}>{label}</span>
                 </Link>
               </li>
             )
