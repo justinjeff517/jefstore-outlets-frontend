@@ -23,32 +23,62 @@ export default function Page() {
   return (
     <div className="mx-auto max-w-sm p-4 space-y-4">
 
-      {/* Today’s Card */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base">Today</CardTitle>
-          <CardDescription className="text-xs">{humanDate} • {isoDate}</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="inline-flex items-center text-sm">
-              <CalendarDays className="mr-2 h-4 w-4" />
-              Date
-            </span>
-            <span className="font-medium">{isoDate}</span>
-          </div>
-          <Separator />
-          <div className="flex items-center justify-between">
-            <span className="inline-flex items-center text-sm">
-              <DollarSign className="mr-2 h-4 w-4" />
-              Total Sales
-            </span>
-            <span className="text-xl font-bold">
-              ₱{totalSales.toLocaleString('en-PH', { minimumFractionDigits: 2 })}
-            </span>
-          </div>
-        </CardContent>
-      </Card>
+{/* Today’s Card */}
+<Card>
+  <CardHeader className="pb-2">
+    <CardTitle className="text-base">Today</CardTitle>
+    <CardDescription className="text-xs">
+      <div className="flex flex-col">
+        <span className="font-medium">
+          {today.toLocaleDateString('en-US', {
+            month: 'short',
+            day: '2-digit',
+            year: 'numeric',
+          })}
+        </span>
+        <span className="text-[11px] opacity-70">{isoDate}</span>
+      </div>
+    </CardDescription>
+  </CardHeader>
+  <CardContent className="space-y-3">
+    <div className="flex items-center justify-between">
+      <span className="inline-flex items-center text-sm">
+        <CalendarDays className="mr-2 h-4 w-4" />
+        Date
+      </span>
+      <div className="text-right">
+        <div className="font-medium">
+          {today.toLocaleDateString('en-US', {
+            month: 'short',
+            day: '2-digit',
+            year: 'numeric',
+          })}
+        </div>
+        <div className="text-[11px] opacity-70">{isoDate}</div>
+      </div>
+    </div>
+    <Separator />
+    <div className="flex items-center justify-between">
+      <span className="text-sm">Egg Sales</span>
+      <span className="font-semibold">₱0.00</span>
+    </div>
+    <div className="flex items-center justify-between">
+      <span className="text-sm">Bread Sales</span>
+      <span className="font-semibold">₱0.00</span>
+    </div>
+    <Separator />
+    <div className="flex items-center justify-between">
+      <span className="inline-flex items-center text-sm">
+        <DollarSign className="mr-2 h-4 w-4" />
+        Total Sales
+      </span>
+      <span className="text-xl font-bold">
+        ₱{totalSales.toLocaleString('en-PH', { minimumFractionDigits: 2 })}
+      </span>
+    </div>
+  </CardContent>
+</Card>
+
 
       {/* Expenses Card */}
       <Card className={editMode ? 'border-red-500' : 'border-green-500'}>

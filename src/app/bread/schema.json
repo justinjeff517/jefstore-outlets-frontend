@@ -1,7 +1,5 @@
 {
   "inventory": {
-    "date": "string",
-    "submitted": "boolean",
     "items": [
       {
         "product": "string",

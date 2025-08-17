@@ -24,18 +24,46 @@ type Expense = {
   saved: boolean
 }
 
-const fallbackRows: Row[] = [
-  { Product: 'EXAMPLEA_PCS_499_99', BeginningStock: 100, Sold: 30, EndingStock: 70, Unit: 'pcs', Price: 499.99, submitted: true },
-  { Product: 'EXAMPLEB_KG_120_50',  BeginningStock: 50,  Sold: 20, EndingStock: 30, Unit: 'kg',  Price: 120.50, submitted: false },
-  { Product: 'SUPERWIDGET_BOX_29_99', BeginningStock: 200, Sold: 75, EndingStock: 125, Unit: 'box', Price: 29.99, submitted: true },
-  { Product: 'MEGATOOL_SET_199_00',  BeginningStock: 80,  Sold: 10, EndingStock: 70, Unit: 'set', Price: 199.00, submitted: false },
+type Item = {
+  product: string
+  unit: string
+  beginning: number
+  addstock: number
+  sold: number
+  price: number
+  ending: number
+}
+
+const eggItems: Item[] = [
+  { product: 'EGG_OS4',   unit: 'pcs', beginning: 360, addstock: 0, sold: 0, price: 5.50, ending: 360 },
+  { product: 'EGG_OS3',   unit: 'pcs', beginning: 420, addstock: 0, sold: 0, price: 6.00, ending: 420 },
+  { product: 'EGG_OS2',   unit: 'pcs', beginning: 600, addstock: 0, sold: 0, price: 6.50, ending: 600 },
+  { product: 'EGG_OS',    unit: 'pcs', beginning: 900, addstock: 0, sold: 0, price: 7.00, ending: 900 },
+  { product: 'EGG_SMALL', unit: 'pcs', beginning: 300, addstock: 0, sold: 0, price: 4.50, ending: 300 },
 ]
 
+const breadItems: Item[] = [
+  { product: 'PANDESAL',      unit: 'pcs', beginning: 200, addstock: 0, sold: 0, price: 3.00,  ending: 200 },
+  { product: 'SPANISH_BREAD', unit: 'pcs', beginning: 150, addstock: 0, sold: 0, price: 8.00,  ending: 150 },
+  { product: 'ENSAYMADA',     unit: 'pcs', beginning: 100, addstock: 0, sold: 0, price: 20.00, ending: 100 },
+  { product: 'MONAY',         unit: 'pcs', beginning: 120, addstock: 0, sold: 0, price: 7.00,  ending: 120 },
+  { product: 'HOPIA',         unit: 'pcs', beginning: 80,  addstock: 0, sold: 0, price: 15.00, ending: 80 },
+]
+
+const toRow = (it: Item): Row => ({
+  Product: it.product,
+  BeginningStock: it.beginning,
+  Sold: it.sold,
+  EndingStock: it.ending,
+  Unit: it.unit,
+  Price: it.price,
+  submitted: true,
+})
+
+const fallbackRows: Row[] = [...eggItems.map(toRow), ...breadItems.map(toRow)]
 const fallbackExpense: Expense = { description: '', amount: 0, saved: false }
 
-// If you change nav height, update this number (h-14 = 56px)
 const NAV_PX = 56
-// Approx height of the submit bar; adjust if you change its content sizing
 const BAR_PX = 112
 
 export default function Page() {
@@ -52,8 +80,16 @@ export default function Page() {
     } catch {}
   }, [])
 
+  useEffect(() => {
+    try {
+      localStorage.setItem('rows', JSON.stringify(rows))
+      localStorage.setItem('expense', JSON.stringify(expense))
+    } catch {}
+  }, [rows, expense])
+
   const today = new Date()
-  const humanDate = today.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  const months = ['Jan.','Feb.','Mar.','Apr.','May.','Jun.','Jul.','Aug.','Sep.','Oct.','Nov.','Dec.']
+  const humanDate = `${months[today.getMonth()]} ${String(today.getDate()).padStart(2,'0')}, ${today.getFullYear()}`
   const isoDate = today.toISOString().slice(0, 10)
 
   const validations = useMemo(() => {
@@ -86,13 +122,60 @@ export default function Page() {
 
   const canSubmit = validations.every(v => v.ok) && (!expense.saved || (expense.saved && expense.amount > 0 && !!expense.description))
 
+  const renderGroup = (title: string, filterFn: (p: string) => boolean) => {
+    const items = validations.filter(v => filterFn(v.product))
+    return (
+      <div className="space-y-2">
+        <div className="flex items-center justify-between mt-1">
+          <h3 className="text-sm font-semibold">{title}</h3>
+          <Badge variant="secondary">{items.length}</Badge>
+        </div>
+        {items.map(({ product, ok, issues, row, computedEnding }) => (
+          <div
+            key={product}
+            className={`rounded-xl border p-3 text-sm ${ok ? 'border-green-500' : 'border-red-500'}`}
+            onClick={() => router.back()}
+            role="button"
+          >
+            <div className="flex items-center justify-between">
+              <div className="font-medium break-words pr-2">{product}</div>
+              <Badge variant={ok ? 'secondary' : 'destructive'} className="whitespace-nowrap">
+                {ok ? 'OK' : 'Issue'}
+              </Badge>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 mt-2">
+              {[
+                { label: 'Beginning', qty: row.BeginningStock },
+                { label: 'Sold', qty: row.Sold },
+                { label: 'Ending', qty: row.EndingStock },
+              ].map(({ label, qty }) => (
+                <div key={label} className="rounded-lg bg-muted p-2 text-center">
+                  <div className="font-semibold">{qty.toLocaleString()} {row.Unit}</div>
+                  <div className="text-xs opacity-70">₱{(qty * row.Price).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</div>
+                  <div className="text-[10px] opacity-60">{label}</div>
+                </div>
+              ))}
+            </div>
+
+            {!ok && (
+              <ul className="mt-2 list-disc pl-5 text-xs text-red-600 space-y-1">
+                {issues.map((msg, i) => <li key={i}>{msg}</li>)}
+                {row.BeginningStock - row.Sold !== row.EndingStock && (
+                  <li className="text-xs text-amber-600">Hint: Computed Ending should be {computedEnding}.</li>
+                )}
+              </ul>
+            )}
+          </div>
+        ))}
+      </div>
+    )
+  }
+
   return (
     <div
       className="mx-auto max-w-sm p-4 space-y-4"
-      style={{
-        // make room for bottom submit bar + mobile nav + safe area
-        paddingBottom: `calc(${BAR_PX}px + ${NAV_PX}px + env(safe-area-inset-bottom))`,
-      }}
+      style={{ paddingBottom: `calc(${BAR_PX}px + ${NAV_PX}px + env(safe-area-inset-bottom))` }}
     >
       <div className="flex items-center justify-between">
         <Button variant="ghost" size="sm" onClick={() => router.back()} className="gap-2">
@@ -148,49 +231,11 @@ export default function Page() {
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-base">Items Review</CardTitle>
-          <CardDescription className="text-xs">Tap any card to fix issues in the previous page</CardDescription>
+          <CardDescription className="text-xs">Grouped by category</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-3">
-          {validations.map(({ product, ok, issues, row, computedEnding }) => (
-            <div
-              key={product}
-              className={`rounded-xl border p-3 text-sm ${ok ? 'border-green-500' : 'border-red-500'}`}
-              onClick={() => router.back()}
-              role="button"
-            >
-              <div className="flex items-center justify-between">
-                <div className="font-medium break-words pr-2">{product}</div>
-                <Badge variant={ok ? 'secondary' : 'destructive'} className="whitespace-nowrap">
-                  {ok ? 'OK' : 'Issue'}
-                </Badge>
-              </div>
-
-              <div className="grid grid-cols-3 gap-2 mt-2">
-                {[
-                  { label: 'Beginning', qty: row.BeginningStock },
-                  { label: 'Sold', qty: row.Sold },
-                  { label: 'Ending', qty: row.EndingStock },
-                ].map(({ label, qty }) => (
-                  <div key={label} className="rounded-lg bg-muted p-2 text-center">
-                    <div className="font-semibold">{qty.toLocaleString()} {row.Unit}</div>
-                    <div className="text-xs opacity-70">₱{(qty * row.Price).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</div>
-                    <div className="text-[10px] opacity-60">{label}</div>
-                  </div>
-                ))}
-              </div>
-
-              {!ok && (
-                <ul className="mt-2 list-disc pl-5 text-xs text-red-600 space-y-1">
-                  {issues.map((msg, i) => <li key={i}>{msg}</li>)}
-                  {row.BeginningStock - row.Sold !== row.EndingStock && (
-                    <li className="text-xs text-amber-600">
-                      Hint: Computed Ending should be {computedEnding}.
-                    </li>
-                  )}
-                </ul>
-              )}
-            </div>
-          ))}
+        <CardContent className="space-y-4">
+          {renderGroup('Eggs', (p) => p.startsWith('EGG'))}
+          {renderGroup('Breads', (p) => !p.startsWith('EGG'))}
         </CardContent>
       </Card>
 
@@ -205,9 +250,7 @@ export default function Page() {
           {expense.saved ? (
             <>
               <div className="whitespace-pre-wrap break-words">{expense.description}</div>
-              <div className="font-bold">
-                ₱{expense.amount.toLocaleString('en-PH', { minimumFractionDigits: 2 })}
-              </div>
+              <div className="font-bold">₱{expense.amount.toLocaleString('en-PH', { minimumFractionDigits: 2 })}</div>
             </>
           ) : (
             <div className="opacity-60">Add an expense in the previous page if needed.</div>
@@ -215,12 +258,9 @@ export default function Page() {
         </CardContent>
       </Card>
 
-      {/* Fixed submit bar — sits ABOVE the mobile bottom nav */}
       <div
         className="fixed inset-x-0 z-40 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
-        style={{
-          bottom: `calc(${NAV_PX}px + env(safe-area-inset-bottom))`,
-        }}
+        style={{ bottom: `calc(${NAV_PX}px + env(safe-area-inset-bottom))` }}
       >
         <div className="mx-auto max-w-sm p-3 space-y-2">
           <div className="flex items-center justify-between text-sm">

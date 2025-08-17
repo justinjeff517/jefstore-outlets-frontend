@@ -1,63 +1,38 @@
 "use client"
+
 import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { Boxes, ShoppingBag, FileText, Settings } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Egg, Sandwich, ShoppingBag, FileText, Settings } from "lucide-react"
 
 const items = [
-  { href: "/inventory", label: "Inventory", Icon: Boxes },
-  { href: "/sales", label: "Sales", Icon: ShoppingBag },
-  { href: "/reports", label: "Reports", Icon: FileText },
-  { href: "/settings", label: "Settings", Icon: Settings },
+  { href: "/eggs", label: "Eggs", Icon: Egg, notif: 3 },
+  { href: "/bread", label: "Bread", Icon: Sandwich, notif: 1 },
+  { href: "/sales", label: "Sales", Icon: ShoppingBag, notif: 2 },
+  { href: "/reports", label: "Reports", Icon: FileText, notif: 4 },
+  { href: "/settings", label: "Settings", Icon: Settings, notif: 1 },
 ]
 
 export default function HomePage() {
-  const pathname = usePathname()
-
   return (
-    <main className="flex min-h-[100dvh] flex-col bg-background text-foreground">
-      {/* Header */}
-      <header className="border-b px-4 py-3 text-center text-xl font-bold">My App</header>
+    <main className="mx-auto max-w-md p-4 pb-20">
+      <h1 className="mb-4 text-center text-2xl font-bold">Dashboard</h1>
 
-      {/* Main content */}
-      <section className="flex-1 p-6">
-        <h1 className="text-2xl font-semibold">Welcome</h1>
-        <p className="mt-2 text-muted-foreground">Choose a section below to get started.</p>
-      </section>
-
-      {/* Bottom navigation */}
-      <nav className="fixed inset-x-0 bottom-0 z-50 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="mx-auto max-w-sm">
-          <ul className="grid grid-cols-4">
-            {items.map(({ href, label, Icon }) => {
-              const active = pathname === href || (href !== "/" && pathname?.startsWith(href))
-              return (
-                <li key={href} className="py-1">
-                  <Link
-                    href={href}
-                    aria-current={active ? "page" : undefined}
-                    className={cn(
-                      "relative flex h-12 flex-col items-center justify-center gap-0.5 text-xs transition-colors",
-                      active ? "text-primary" : "text-muted-foreground hover:text-foreground/80"
-                    )}
-                  >
-                    {/* Top indicator (no box) */}
-                    <span
-                      className={cn(
-                        "absolute -top-1 h-1 w-8 rounded-full transition-opacity",
-                        active ? "bg-primary opacity-100" : "opacity-0"
-                      )}
-                    />
-                    <Icon className={cn("h-5 w-5 transition-transform", active && "scale-110")} />
-                    <span className={cn(active && "font-semibold")}>{label}</span>
-                  </Link>
-                </li>
-              )
-            })}
-          </ul>
-          <div className="h-[env(safe-area-inset-bottom)]" />
-        </div>
-      </nav>
+      <div className="space-y-2">
+        {items.map(({ href, label, Icon, notif }) => (
+          <Link key={href} href={href}>
+            <Card className="hover:bg-muted/50 transition">
+              <CardContent className="flex items-center justify-between p-4">
+                <div className="flex items-center gap-3">
+                  <Icon className="h-6 w-6 text-primary" />
+                  <span className="text-base font-medium">{label}</span>
+                </div>
+                <Badge variant="secondary" className="px-2">{notif}</Badge>
+              </CardContent>
+            </Card>
+          </Link>
+        ))}
+      </div>
     </main>
   )
 }
