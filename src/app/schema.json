@@ -1,0 +1,29 @@
+{
+  "inventory": {
+    "id": "string",
+    "date": "string",
+    "submitted": "boolean",
+    "egg_items": [
+      {
+        "product": "string",
+        "unit": "string",
+        "beginning": "number",
+        "addstock": "number",
+        "sold": "number",
+        "price": "number",
+        "ending": "number"
+      }
+    ],
+    "bread_items": [
+      {
+        "product": "string",
+        "unit": "string",
+        "beginning": "number",
+        "addstock": "number",
+        "sold": "number",
+        "price": "number",
+        "ending": "number"
+      }
+    ]
+  }
+}

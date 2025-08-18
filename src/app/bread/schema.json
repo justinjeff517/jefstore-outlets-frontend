@@ -1,5 +1,7 @@
 {
-  "inventory": {
+  "bread_inventory": {
+    "id":"string",
+    "date": "string",
     "items": [
       {
         "product": "string",
